@@ -1,0 +1,23 @@
+//- layout.jade
+doctype html
+
+html
+  head
+    link(rel='stylesheet', href='bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css')
+    script(type='text/javascript' src="bower_components/jquery/dist/jquery.min.js")
+    script(type='text/javascript' src="bower_components/jquery/dist/jquery.min.js")    
+    script(type='text/javascript' src="bower_components/threejs/build/three.min.js")
+    script(type='text/javascript' src="bower_components/threex.domevents/threex.domevents.js")
+    script(type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js")
+    script(type='text/javascript' src="bower_components/socket.io-client/socket.io.js")
+    script(type='text/javascript' src='usefulJsTools.js')
+    link(rel='stylesheet', href='stylesheets/style.css')
+
+    block title
+      title No title, please set a block title.
+  body
+    block includes
+    block content
+      content No content on this page.
+
+

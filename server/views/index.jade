@@ -1,0 +1,24 @@
+//- index.jade
+extends ./_layout.jade
+
+block includes
+  script(type='text/javascript' src='sample2.js')
+  script(type='text/javascript' src='background.js')
+  script(type='text/javascript' src='cta.js')
+  script(type='text/javascript' src='events.js')
+  script(type='text/javascript' src='debugTools.js')
+
+block title
+  title #{title} Welcome to EpixHell
+
+block content
+  header
+    h1 Site
+  .container
+    .main-content
+      block content
+    .sidebar
+      block sidebar
+  footer
+    p Running on node with Express, Jade and Stylus
+
