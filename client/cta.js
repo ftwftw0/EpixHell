@@ -4,8 +4,8 @@ window.cta = (function(win, $, TweenMax, THREEx) {
     var shape;
 
     function init() {
-        shape = addDodecahedron(0xff0000, 50);
-        render();
+        shape = epixlib.addDodecahedron(0xff0000, 10);
+	update();
 	// Add events
         domEvents = new THREEx.DomEvents(g_camera, g_renderer.domElement);
         domEvents.addEventListener(shape, 'click', function(event) {
@@ -23,26 +23,7 @@ window.cta = (function(win, $, TweenMax, THREEx) {
         }, false);
     }
 
-    function addDodecahedron(color, radius) {
-        var DETAIL = 0;
-        var geometry;
-        var material;
-        var shape;
-
-        geometry = new THREE.DodecahedronGeometry(radius, DETAIL);
-        material = new THREE.MeshPhongMaterial({
-            emissive: 0x000000,
-            color: color,
-            transparent: true,
-            opacity: 0.5,
-            wireframe: true
-        });
-        shape = new THREE.Mesh(geometry, material);
-        g_scene.add(shape);
-        return shape;
-    }
-
-    function render() {
+    function update() {
         if (typeof shape === 'object') {
             shape.rotation.x += 0.01;
             shape.rotation.y += 0.01;
@@ -51,7 +32,7 @@ window.cta = (function(win, $, TweenMax, THREEx) {
 
     return {
         init: init,
-        render: render
+        update: update
     };
 
 })(window, this.jQuery, this.TweenMax, this.THREEx);

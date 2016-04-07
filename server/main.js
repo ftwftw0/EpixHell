@@ -32,37 +32,79 @@ fs.readdirSync('./controllers').forEach(function (file) {
     }
 });
 
-
 // --- managing socket connections ---
 var SOCKET_LIST = {};
 io.sockets.on('connection', function(socket){
-    console.log('New socket connection !');
     socket.id = Math.random();
+    console.log('New socket connection (id: ' + socket.id + ')');
     socket.x = 0;
     socket.y = 0;
     socket.z = 0;
+    socket.size = 1;
     SOCKET_LIST[socket.id] = socket;
 
-    socket.on('newplayer', function(data){
+    socket.on('newPlayer', function(data){
 	console.log('New player : ' + data.name);
+	// TAKE CARE TO EXISTING NAMES, AS NAMES ARE USED AS IDs A DOUBLE ENTRY WOULD FUCK TWO PLAYERS
+	socket.name = data.name;
+	for (var i in SOCKET_LIST)
+	{
+	    var other = SOCKET_LIST[i];
+	    if (other.name)
+	    {
+		other.emit('newPlayer', {name: socket.name,
+					 x: socket.x,
+					 y: socket.y,
+					 z: socket.z,
+					 size:socket.size});
+		// THIS SHOULD CAUSE DOUBLE ENTRIES IN CLIENTS. SOLVE THAT LATER BROH.
+		socket.emit('newPlayer', {name: other.name,
+					  x: other.x,
+					  y: other.y,
+					  z: other.z,
+					  size:other.size});
+		console.log("Sending " + other.name + " infos to " + socket.name);
+	    }
+	}
+    });
+
+    socket.on('disconnect', function(socket){
+	console.log('Socket disconnected (id: ' + this.id + ')');
+	delete SOCKET_LIST[socket.id];
     });
 });
 
+// Game loop, called once every 17ms (like 1000/60), which does 60times/sec
 setInterval(function(){
+    var pack = [];
+
     for (var i in SOCKET_LIST)
     {
 	var socket = SOCKET_LIST[i];
-	socket.x++;
-	socket.y++;
-	socket.emit('newPosition', {
-	    x:socket.x,
-	    y:socket.y
-	});
+	if (socket.name)
+	{
+	    socket.x += Math.floor(Math.random() * 3 - 1);
+	    socket.y += Math.floor(Math.random() * 3 - 1);
+	    socket.z += Math.floor(Math.random() * 3 - 1);
+	    pack.push({
+		name: socket.name,
+		x:socket.x,
+		y:socket.y,
+		z:socket.z,
+		size:socket.size
+	    });
+	}
     }
-});
+    for (var i in SOCKET_LIST)
+    {
+	var socket = SOCKET_LIST[i];
+	socket.emit('newPositions', pack);
+    }
+
+}, 1000/200);
 
 // --- makes the server listen on port previously set with app.set('port', 8081)
-serv.listen(app.get('port'), function(){
+serv.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
 });
 

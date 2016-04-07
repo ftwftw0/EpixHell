@@ -1,7 +1,6 @@
 // Place all the behaviors and hooks related to the matching controller here.
 // All this logic will automatically be available in application.js.
 $(document).ready(function() {
-    var socket = io();
     var $el;
     g_renderer = null;
     g_scene = null;
@@ -13,16 +12,7 @@ $(document).ready(function() {
 	background.init();
 	cta.init($('body'));
 
-	// New player request to server
-	socket.emit('newplayer', {name: 'IceTea'});
-
-	// Position updates :
-	socket.on('newPosition', function(data) {
-	    g_camera.position.x = data.x;
-	    g_camera.position.y = data.x;
-	});
-
-
+	game.init();
 
 
 	// Load my debug tools
@@ -48,29 +38,17 @@ $(document).ready(function() {
 	g_renderer.setPixelRatio( window.devicePixelRatio );
 
 	$el.append(g_renderer.domElement);
-
-	// Pull the cameru up 120 and outwards 300
-	g_camera.position.y = 10;
-	g_camera.position.z = 10;
-	g_camera.position.x = 10;
-	g_camera.lookAt(g_scene.position);
-
-
-    }
-
-    function update() {
     }
 
     // That's the display loop, should be called 60times/sec
     function render() {
 //	var timer = Date.now() * 0.0001;
-	update();
-	background.render();
-	cta.render();
+	background.update();
+	cta.update();
+	game.update();
 
 	g_renderer.render(g_scene, g_camera);
 	requestAnimationFrame(render);
     }
-
 });
 
