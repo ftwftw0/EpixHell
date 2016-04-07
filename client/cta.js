@@ -8,7 +8,7 @@ window.cta = (function(win, $, TweenMax, THREEx) {
 	update();
 	// Add events
         domEvents = new THREEx.DomEvents(g_camera, g_renderer.domElement);
-        domEvents.addEventListener(shape, 'click', function(event) {
+	domEvents.addEventListener(shape, 'click', function(event) {
             var AN_TIME = 0.15;
             TweenMax.to(shape.scale, AN_TIME, {x: 1.4, y: 1.4, z: 1.4});
             TweenMax.to(shape.scale, AN_TIME, {x: 1, y: 1, z: 1, delay: AN_TIME});

@@ -34,7 +34,7 @@ fs.readdirSync('./controllers').forEach(function (file) {
 
 // --- managing socket connections ---
 var SOCKET_LIST = {};
-io.sockets.on('connection', function(socket){
+io.sockets.on('connection', function(socket) {
     socket.id = Math.random();
     console.log('New socket connection (id: ' + socket.id + ')');
     socket.x = 0;
@@ -43,20 +43,20 @@ io.sockets.on('connection', function(socket){
     socket.size = 1;
     SOCKET_LIST[socket.id] = socket;
 
-    socket.on('newPlayer', function(data){
+    socket.on('newPlayer', function(data) {
 	console.log('New player : ' + data.name);
 	// TAKE CARE TO EXISTING NAMES, AS NAMES ARE USED AS IDs A DOUBLE ENTRY WOULD FUCK TWO PLAYERS
 	socket.name = data.name;
 	for (var i in SOCKET_LIST)
 	{
 	    var other = SOCKET_LIST[i];
-	    if (other.name)
+	    other.emit('newPlayer', {name: socket.name,
+				     x: socket.x,
+				     y: socket.y,
+				     z: socket.z,
+				     size:socket.size});
+	    if (other.name && other != socket)
 	    {
-		other.emit('newPlayer', {name: socket.name,
-					 x: socket.x,
-					 y: socket.y,
-					 z: socket.z,
-					 size:socket.size});
 		// THIS SHOULD CAUSE DOUBLE ENTRIES IN CLIENTS. SOLVE THAT LATER BROH.
 		socket.emit('newPlayer', {name: other.name,
 					  x: other.x,
@@ -64,6 +64,7 @@ io.sockets.on('connection', function(socket){
 					  z: other.z,
 					  size:other.size});
 		console.log("Sending " + other.name + " infos to " + socket.name);
+		console.log("Sending " + socket.name + " infos to " + other.name);
 	    }
 	}
     });
@@ -101,7 +102,7 @@ setInterval(function(){
 	socket.emit('newPositions', pack);
     }
 
-}, 1000/200);
+}, 1);
 
 // --- makes the server listen on port previously set with app.set('port', 8081)
 serv.listen(app.get('port'), function() {

@@ -10,14 +10,15 @@ window.game = (function(win, $) {
 	for (var i = 0 ; i < 5 ; i++ ) // Random name generator
 	    playerName += "abcdefghijklmnopqrstuvwxyz".charAt(Math.floor(Math.random() * 52));
 //	playerName.charAt(0).toUpperCase();
+	console.log("Requesting server for this name : " + playerName);
 	socket.emit('newPlayer', {name: playerName});
     }
 
     // Position updates :
     socket.on('newPositions', function(data) {
-	for (var i = 0; data.length; i++)
+	for (var i = 0; i < data.length; i++)
 	{
-	    if (data[i])
+	    if (data[i] && players[data[i].name])
 	    {
 		var player = players[data[i].name];
 		player.shape.position.x = data[i].x;
@@ -26,20 +27,24 @@ window.game = (function(win, $) {
 		player.size = data[i].size;
 	    }
 	    else
-		console.log("Cannot update an uninstantiated player.");
+		console.log("Cannot update an uninstantiated player");
 	}
     });
 
+
     // New player instantiation :
     socket.on('newPlayer', function(data) {
-	console.log("New player connected : " + data);
-	var newplayer = {};
-	newplayer.shape = epixlib.addSphere(0xffffff, 1, 10 * data.size, 10, 0.9);
-	newplayer.shape.position.x = data.x;
-	newplayer.shape.position.y = data.y;
-	newplayer.shape.position.z = data.z;
-	newplayer.size = data.size;
-	players[data.name] = newplayer;
+	if (data.name)
+	{
+	    console.log("New player connected : " + data.name + " (" + data.x + ", " + data.y + ", " + data.z + ")");
+	    var newplayer = {};
+	    newplayer.shape = epixlib.addSphere(0xffffff, 1, 10 * data.size, 10, 0.9);
+	    newplayer.shape.position.x = data.x;
+	    newplayer.shape.position.y = data.y;
+	    newplayer.shape.position.z = data.z;
+	    newplayer.size = data.size;
+	    players[data.name] = newplayer;
+	}
     });
 
     function update()
