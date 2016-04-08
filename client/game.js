@@ -1,5 +1,5 @@
 window.game = (function(win, $) {
-    var socket = io();
+    g_socket = io();
     var players = {};
     var playerName = "";
 
@@ -8,14 +8,14 @@ window.game = (function(win, $) {
     {
 	// New player request to server
 	for (var i = 0 ; i < 5 ; i++ ) // Random name generator
-	    playerName += "abcdefghijklmnopqrstuvwxyz".charAt(Math.floor(Math.random() * 52));
-//	playerName.charAt(0).toUpperCase();
+	    playerName += "abcdefghijklmnopqrstuvwxyz".charAt(Math.floor(Math.random() * 26));
+	playerName.charAt(0).toUpperCase();
 	console.log("Requesting server for this name : " + playerName);
-	socket.emit('newPlayer', {name: playerName});
+	g_socket.emit('newPlayer', {name: playerName});
     }
 
     // Position updates :
-    socket.on('newPositions', function(data) {
+    g_socket.on('newPositions', function(data) {
 	for (var i = 0; i < data.length; i++)
 	{
 	    if (data[i] && players[data[i].name])
@@ -33,7 +33,7 @@ window.game = (function(win, $) {
 
 
     // New player instantiation :
-    socket.on('newPlayer', function(data) {
+    g_socket.on('newPlayer', function(data) {
 	if (data.name)
 	{
 	    console.log("New player connected : " + data.name + " (" + data.x + ", " + data.y + ", " + data.z + ")");
@@ -43,6 +43,7 @@ window.game = (function(win, $) {
 	    newplayer.shape.position.y = data.y;
 	    newplayer.shape.position.z = data.z;
 	    newplayer.size = data.size;
+	    newplayer.name = data.name;
 	    players[data.name] = newplayer;
 	}
     });

@@ -6,7 +6,7 @@ window.cta = (function(win, $, TweenMax, THREEx) {
     function init() {
         shape = epixlib.addDodecahedron(0xff0000, 10);
 	update();
-	// Add events
+	// Adding object events
         domEvents = new THREEx.DomEvents(g_camera, g_renderer.domElement);
 	domEvents.addEventListener(shape, 'click', function(event) {
             var AN_TIME = 0.15;

@@ -1,8 +1,27 @@
 window.events = (function(win, $) {
     // Event handlers
 
-    $(win).bind('onkeydown', function(event) {
-	
+    $(win).bind('keydown', function(event) {
+	if (event.keyCode === 65 || event.keyCode === 37)
+	    g_socket.emit('keyPress', {inputId: 'left', state: true});
+	else if (event.keyCode === 87 || event.keyCode === 38)
+	    g_socket.emit('keyPress', {inputId: 'up', state: true});
+	else if (event.keyCode === 68 || event.keyCode === 39)
+	    g_socket.emit('keyPress', {inputId: 'right', state: true});
+	else if (event.keyCode === 83 || event.keyCode === 40)
+	    g_socket.emit('keyPress', {inputId: 'down', state: true});
+	console.log("Move : " + event.keyCode);
+    });
+
+    $(win).bind('keyup', function(event) {
+	if (event.keyCode === 65 || event.keyCode === 37)
+	    g_socket.emit('keyPress', {inputId: 'left', state: false});
+	else if (event.keyCode === 87 || event.keyCode === 38)
+	    g_socket.emit('keyPress', {inputId: 'up', state: false});
+	else if (event.keyCode === 68 || event.keyCode === 39)
+	    g_socket.emit('keyPress', {inputId: 'right', state: false});
+	else if (event.keyCode === 83 || event.keyCode === 40)
+	    g_socket.emit('keyPress', {inputId: 'down', state: false});
     });
 
     // Camera moves on y upon scrolling (mouse wheel)
