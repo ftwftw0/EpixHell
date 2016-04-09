@@ -1,6 +1,7 @@
 //
 // Web server configuration
 //
+'use strict';
 // Core for NodeJs server to run
 var http = require('http');
 var path = require('path');
@@ -25,7 +26,7 @@ app.use(express.static(path.join(__dirname, './assets/')));
 // --- dynamically include routes (Controllers) ---
 fs.readdirSync('./controllers').forEach(function (file) {
     if (file.substr(-3) == '.js') {
-	route = require('./controllers/' + file);
+	var route = require('./controllers/' + file);
 	route.controller(app);
     }
 });
@@ -34,4 +35,6 @@ fs.readdirSync('./controllers').forEach(function (file) {
 serv.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
 });
+
+var Game = require('./game/game.js')(io);
 

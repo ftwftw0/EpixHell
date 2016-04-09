@@ -10,7 +10,7 @@ window.background = (function(win, $) {
 	addLights();
 	for (var i = 0; i < STARS; i++)
 	{
-            point = epixlib.addSphere(getRandomArbitrary(0x000000, 0xffffff), 2, 6, 6);
+            point = epixlib.addSphere(getRandomArbitrary(0x000000, 0xffffff), 2, 6, 6, 0.2);
 	    point.position.x = getRandomArbitrary(-400, 400);
 	    point.position.y = getRandomArbitrary(500, -500);
             point.position.z = getRandomArbitrary(-400, 100);
