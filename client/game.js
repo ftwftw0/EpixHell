@@ -31,7 +31,6 @@ window.game = (function(win, $) {
 	}
     });
 
-
     // New player instantiation :
     g_socket.on('newPlayer', function(data) {
 	if (data.name)
@@ -60,6 +59,14 @@ window.game = (function(win, $) {
 	}
 	else
 	    console.log("Your player does not exist at the moment.");
+	
+	// Position debug
+	if (players[playerName])
+	{
+	    console.log("My position : " + players[playerName].shape.position.x +
+			", " + players[playerName].shape.position.y +
+			", " + players[playerName].shape.position.z);
+	}
     }
 
     return {

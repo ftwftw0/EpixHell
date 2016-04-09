@@ -14,14 +14,14 @@ window.debug = (function(win, $) {
 	g_scene.add(grid);
     }
 
-    function render()
+    function update()
     {
-
+	
     }
 
     return {
         init: init,
-        render: render
+        update: update
     };
 
 })(window, jQuery);

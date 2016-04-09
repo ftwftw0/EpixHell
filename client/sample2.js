@@ -14,10 +14,8 @@ $(document).ready(function() {
 
 	game.init();
 
-
 	// Load my debug tools
 	debug.init();
-
 
 	render();
     });
