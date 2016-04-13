@@ -10,6 +10,8 @@ window.events = (function(win, $) {
 	    g_socket.emit('keyPress', {inputId: 'right', state: true});
 	else if (event.keyCode === 83 || event.keyCode === 40)
 	    g_socket.emit('keyPress', {inputId: 'down', state: true});
+	else if (event.keyCode === 32)
+	    g_socket.emit('keyPress', {inputId: 'split', state: true});
 	console.log("Move : " + event.keyCode);
     });
 

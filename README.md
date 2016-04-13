@@ -11,20 +11,17 @@ Then i'll have to make it playable in 3D, including smooth camera and player mov
 
 # Backend
 
-- Get bigger - set collisions
+- Get bigger on collisions (? should i? maybe only center needs to collide)
 - Spawn some 'food' planet
-- Eat people smaller
--- Set full code to 'strict mode'; for both server and clients. Seems more explicit, avoiding incomprehensions.
+- Close socket listener for keys when player is dead
 
-   Setting to strict mode allows you to use real NodeJS OOP, which wont replicate all class code into each
-   instance of an 'object' (...optimizition!).
-- 'Pack' the game in a single node module, with only needed elements accessible
+- 'Pack' the game in a single node module, with only needed elements accessible (ie. no global variable)
 - Smooth moves
 - Disconnect player when he leaves
 
 # Frontend
 
-- Set full code to 'strict mode'; for both server and clients. Seems more explicit, avoiding incomprehensions.
+- Reinstanciate bigger sphere when receiving a size bigger than actual one.
 
 ### 3D Game ###
 

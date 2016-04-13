@@ -22,7 +22,7 @@ $(document).ready(function() {
 
     function createBaseScene($element) {
         var ASPECT = window.innerWidth / window.innerHeight;
-	var FAR = 1000;
+	var FAR = 5000;
         var FOV = 45;
 	var NEAR = 0.1;
 
