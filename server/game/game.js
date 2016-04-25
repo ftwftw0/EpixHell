@@ -18,12 +18,13 @@ module.exports = (io) => {
 */
 
     global.Player = require("./player.class");
+    global.Food = require("./food.class");
     global.createNewPlayer = require("./createNewPlayer");
     global.sendNewPlayerInfos = require("./sendNewPlayerInfos");
     global.playerKeyInputs = require("./playerKeyInputs");
     global.getPlayersInfos = require("./getPlayersInfos");
-    global.getElementsInfos = require("./getPlayersInfos");
-    global.sendPlayerDied = require("./sendPlayerDied");
+    global.getElementsInfos = require("./getElementsInfos");
+    global.sendElementDied = require("./sendElementDied");
     global.createFood = require("./createFood");
 
     /*
@@ -35,11 +36,20 @@ module.exports = (io) => {
     global.world = new CANNON.World();
     world.gravity.set(0, 0, 0); // m/s²
     const NEW_PLAYERS_SIZE = 2;
+    const START_FOOD = 100;
     
     // --- GLOBAL GAME OBJECTS ---
     global.SOCKET_LIST = {};
     global.PLAYER_LIST = {};
-    global.ELEMENT_LIST = {};
+    global.ELEMENT_LIST = [];
+
+    // Game Initialisation
+    for (var i = 0; i < START_FOOD; i++)
+    {
+	createFood(Math.floor(Math.random() * (+500 - -400 + 1)) + -400,
+		   Math.floor(Math.random() * (+500 - -400 + 1)) + -400,
+		   0);
+    }
 
     /*
     **  Real code begins now
@@ -57,10 +67,7 @@ module.exports = (io) => {
 
 	    // Adds player to player_list and its
 	    // character (a sphere) to world
-	    var player = new Player(data.name, NEW_PLAYERS_SIZE);
-	    // Adds the player to player list, and element list
-	    PLAYER_LIST[socket.id] = player;
-	    ELEMENT_LIST[socket.id] = player;
+	    var player = new Player(socket.id, data.name, NEW_PLAYERS_SIZE, 0,0,0);
 	    // Adds a reference to the player into corresponding socket
 	    socket.player = player;
 	    player.socket = socket;
@@ -77,9 +84,9 @@ module.exports = (io) => {
 
 	socket.on('disconnect', function(socket){
 	    console.log('Socket disconnected (id: ' + this.id + ')');
-	    delete SOCKET_LIST[socket.id];
 	    delete ELEMENT_LIST[socket.id];
 	    delete PLAYER_LIST[socket.id];
+	    delete SOCKET_LIST[socket.id];
 	});
     });
 
@@ -103,10 +110,10 @@ module.exports = (io) => {
 	    var element = ELEMENT_LIST[i];
 	    
 	    // Only players are updated for now
-	    if (element.type === 'player')
+	    if (element && element.type === 'player')
 		element.update();
 	}
-	// Packaging all players infos into a table.
+	// Packaging all elements infos into a table.
 	var pack = getElementsInfos(ELEMENT_LIST);
 	// Send the package to every sockets connected, even those not playing.
 	for (var i in SOCKET_LIST)

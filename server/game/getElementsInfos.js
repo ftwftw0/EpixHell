@@ -6,10 +6,12 @@ var getElementsInfos = function(ELEMENT_LIST) {
     {
         var element = ELEMENT_LIST[i];
         pack.push({name: element.name,
-                   x: element.body.position.x,
-                   y: element.body.position.y,
-                   z: element.body.position.z,
-                   size: element.size})
+		       id: element.id,
+		       type: element.type,
+                       x: element.body.position.x,
+                       y: element.body.position.y,
+                       z: element.body.position.z,
+                       size: element.size})
     }
     return pack;
 }

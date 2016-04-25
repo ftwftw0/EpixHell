@@ -4,16 +4,16 @@
 ** body is a reference to a CANNON.js shape
 */
 'use strict';
-var Player = function (name, size) {
+var Player = function (id, name, size, x, y, z) {
     //*******************//
     // Constructor mastaa
     //*******************//
-
+    this.id = id;
     // TAKE CARE TO EXISTING NAMES, AS NAMES ARE USED AS IDs ON CLIENT, A \DOUBLE ENTRY WOULD FUCK CONCERNED PLAYERS
     // Add physics to player, its a sphere
     this.body = new CANNON.Body({
         mass: size, // kg
-        position: new CANNON.Vec3(0,0,0), // m
+        position: new CANNON.Vec3(x, y, z), // m
         shape: new CANNON.Sphere(size)
     });
     
@@ -33,6 +33,9 @@ var Player = function (name, size) {
     this.pressingUp = false;
     this.pressingRight = false;
     this.pressingDown = false;
+    // Adds the player to player list, and element list
+    PLAYER_LIST[this.id] = this;
+    ELEMENT_LIST[this.id] = this;
 }
 
 // Methods
@@ -60,10 +63,10 @@ Player.prototype.update = function(data) {
 Player.prototype.Die = function() {
     this.setSize(0);
 //    world.removeBody(this.body);
-    sendPlayerDied(this);
+    sendElementDied(this);
     delete this.body;
-    delete PLAYER_LIST[this.socket.id];
-    delete ELEMENT_LIST[this.socket.id];
+    delete PLAYER_LIST[this.id];
+    delete ELEMENT_LIST[this.id];
     delete this;
 }
 

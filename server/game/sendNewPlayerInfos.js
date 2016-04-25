@@ -7,6 +7,7 @@ var sendNewPlayerInfos = function(newPlayerSocket, newPlayer) {
 	var elem = ELEMENT_LIST[i];
 
 	newPlayerSocket.emit('newElem', {name: elem.name,
+					 id: elem.id,
 					 type: elem.type,
 					   x: elem.body.position.x,
 					   y: elem.body.position.y,
@@ -23,6 +24,7 @@ var sendNewPlayerInfos = function(newPlayerSocket, newPlayer) {
 	{
 	    console.log("Gonna send " + newPlayer.name + " infos to " + other.id);
 	    other.emit('newElem', {name: newPlayer.name,
+				   id: elem.id,
 				   type: newPlayer.type,
 				   x: newPlayer.body.position.x,
 				   y: newPlayer.body.position.y,

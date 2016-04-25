@@ -28,6 +28,7 @@ Player.prototype.update = function(data) {
 	g_scene.remove(this.shape);
 	this.shape = epixlib.addSphere(0xffffff, data.size, 10, 10, 0.9);
     }
+    this.type = data.type;
     this.shape.position.x = data.x;
     this.shape.position.y = data.y;
     this.shape.position.z = data.z;

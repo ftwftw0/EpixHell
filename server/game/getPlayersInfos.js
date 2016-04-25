@@ -6,6 +6,7 @@ var getPlayersInfos = function(PLAYER_LIST) {
     {
         var player = PLAYER_LIST[i];
         pack.push({name: player.name,
+		   type: player.type,
                    x: player.body.position.x,
                    y: player.body.position.y,
                    z: player.body.position.z,
