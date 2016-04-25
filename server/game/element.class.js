@@ -4,31 +4,14 @@
 ** body is a reference to a CANNON.js shape
 */
 'use strict';
-var Player = function (name, size) {
-    //*******************//
-    // Constructor mastaa
-    //*******************//
+var NEW_PLAYERS_SIZE = 1;
 
-    // TAKE CARE TO EXISTING NAMES, AS NAMES ARE USED AS IDs ON CLIENT, A \DOUBLE ENTRY WOULD FUCK CONCERNED PLAYERS
-    // Add physics to player, its a sphere
-    this.body = new CANNON.Body({
-        mass: size, // kg
-        position: new CANNON.Vec3(0,0,0), // m
-        shape: new CANNON.Sphere(size)
-    });
-    
-    // Add collisions to newplayer's body
-    this.body.collisionResponse = 0; // no impact on other bodys
-    this.body.element = this;
-    this.body.addEventListener("collide", function(e){
-        this.element.collidedWith(e.body.element);
-    });
-    // Add player to world
-    world.addBody(this.body);
+var Player = function (name, body, size) {
+    // Constructor
     this.name = name;
-    this.type = "player";
     this.size = size;
     this.speed = 1;
+    this.body = body;
     this.pressingLeft = false;
     this.pressingUp = false;
     this.pressingRight = false;
@@ -69,7 +52,7 @@ Player.prototype.Die = function() {
 
 Player.prototype.replaceBody = function(size) {
     var body = new CANNON.Body({
-        mass: size, // kg
+        mass: NEW_PLAYERS_SIZE, // kg
         position: new CANNON.Vec3(this.body.position.x,
                                   this.body.position.y,
                                   this.body.position.z), // m
@@ -82,11 +65,11 @@ Player.prototype.replaceBody = function(size) {
     world.removeBody(this.body);
     delete this.body;
     this.body = body;
-    this.body.element = this;
+    this.body.player = this;
     if (size > 0)
     {
 	this.body.addEventListener("collide", function(e){
-	    body.element.collidedWith(e.body.element);
+	    body.player.collidedWith(e.body.player);
 	});
     }
     world.addBody(this.body);
@@ -95,24 +78,21 @@ Player.prototype.replaceBody = function(size) {
 }
 
 // What happens when a player collides with another
-Player.prototype.collidedWith = function(element) {
-    if (element.type === 'player')
+Player.prototype.collidedWith = function(otherplayer) {
+    if (PLAYER_LIST[otherplayer.socket.id])
     {
-	if (PLAYER_LIST[element.socket.id])
+	console.log(this.name + '('+this.size+')');
+	console.log(" collided with ");
+	console.log(otherplayer.name + '(' + otherplayer.size + ')');
+	if (this.size > otherplayer.size)
 	{
-	    console.log(this.name + '('+this.size+')');
-	    console.log(" collided with ");
-	    console.log(element.name + '(' + element.size + ')');
-	    if (this.size > element.size)
-	    {
-		this.setSize(this.size + element.size);
-		console.log("GOTTA REMOVE PLAYER_LIST[e.body.player.socket.id] :" + PLAYER_LIST[element.socket.id].name);
-		element.Die();
-	    }
+	    this.setSize(this.size + otherplayer.size);
+            console.log("GOTTA REMOVE PLAYER_LIST[e.body.player.socket.id] :" + PLAYER_LIST[otherplayer.socket.id].name);
+            otherplayer.Die();
 	}
-	else
-	    console.log("Collided with an already dead player.");
     }
+    else
+	console.log("Collided with an already dead player.");
 }
 
 Player.prototype.setSize = function(newsize) {

@@ -22,7 +22,9 @@ module.exports = (io) => {
     global.sendNewPlayerInfos = require("./sendNewPlayerInfos");
     global.playerKeyInputs = require("./playerKeyInputs");
     global.getPlayersInfos = require("./getPlayersInfos");
+    global.getElementsInfos = require("./getPlayersInfos");
     global.sendPlayerDied = require("./sendPlayerDied");
+    global.createFood = require("./createFood");
 
     /*
     ** Game configuration starts here
@@ -32,12 +34,12 @@ module.exports = (io) => {
     // Setup our world, and its gravity
     global.world = new CANNON.World();
     world.gravity.set(0, 0, 0); // m/s²
-
+    const NEW_PLAYERS_SIZE = 2;
+    
     // --- GLOBAL GAME OBJECTS ---
     global.SOCKET_LIST = {};
     global.PLAYER_LIST = {};
     global.ELEMENT_LIST = {};
-
 
     /*
     **  Real code begins now
@@ -55,9 +57,10 @@ module.exports = (io) => {
 
 	    // Adds player to player_list and its
 	    // character (a sphere) to world
-	    var player = createNewPlayer(world, data);
-	    // Adds the player to player list
+	    var player = new Player(data.name, NEW_PLAYERS_SIZE);
+	    // Adds the player to player list, and element list
 	    PLAYER_LIST[socket.id] = player;
+	    ELEMENT_LIST[socket.id] = player;
 	    // Adds a reference to the player into corresponding socket
 	    socket.player = player;
 	    player.socket = socket;
@@ -75,6 +78,7 @@ module.exports = (io) => {
 	socket.on('disconnect', function(socket){
 	    console.log('Socket disconnected (id: ' + this.id + ')');
 	    delete SOCKET_LIST[socket.id];
+	    delete ELEMENT_LIST[socket.id];
 	    delete PLAYER_LIST[socket.id];
 	});
     });
@@ -93,15 +97,17 @@ module.exports = (io) => {
 	}
 	lastTime = date.getTime();
 
-	// Updates all players, like position, etc.
-	for (var i in PLAYER_LIST)
+	// Updates all elements, like position, etc.
+	for (var i in ELEMENT_LIST)
 	{
-	    var player = PLAYER_LIST[i];
-//	    if (typeof(element) === 'Player')
-		player.update();
+	    var element = ELEMENT_LIST[i];
+	    
+	    // Only players are updated for now
+	    if (element.type === 'player')
+		element.update();
 	}
 	// Packaging all players infos into a table.
-	var pack = getPlayersInfos(PLAYER_LIST);
+	var pack = getElementsInfos(ELEMENT_LIST);
 	// Send the package to every sockets connected, even those not playing.
 	for (var i in SOCKET_LIST)
 	{

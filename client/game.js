@@ -35,8 +35,8 @@ window.game = (function(win, $) {
     });
 
     // New player instantiation :
-    g_socket.on('newPlayer', function(data) {
-	if (data.name)
+    g_socket.on('newElem', function(data) {
+	if (data.type == "player")
 	{
 	    console.log("New player connected : " + data.name + " (" + data.x + ", " + data.y + ", " + data.z + ")");
 	    var shape = epixlib.addSphere(0xffffff, data.size, 10, 10, 0.9);
