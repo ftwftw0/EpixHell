@@ -1,3 +1,4 @@
+
 'use strict';
 module.exports = (io) => {
 /**************************************/
@@ -20,35 +21,40 @@ module.exports = (io) => {
     global.Player = require("./player.class");
     global.Food = require("./food.class");
     global.createNewPlayer = require("./createNewPlayer");
-    global.sendNewPlayerInfos = require("./sendNewPlayerInfos");
+    global.sendGameInfosToNewPlayer = require("./sendGameInfosToNewPlayer");
     global.playerKeyInputs = require("./playerKeyInputs");
-    global.getPlayersInfos = require("./getPlayersInfos");
     global.getElementsInfos = require("./getElementsInfos");
     global.sendElementDied = require("./sendElementDied");
-    global.createFood = require("./createFood");
+    global.sendNewElem = require("./sendNewElem");
 
     /*
     ** Game configuration starts here
     */
     // Images per second
-    var FPS = 150;
+    var FPS = 100;
     // Setup our world, and its gravity
     global.world = new CANNON.World();
     world.gravity.set(0, 0, 0); // m/s²
-    const NEW_PLAYERS_SIZE = 2;
-    const START_FOOD = 100;
+    global.NEW_PLAYERS_SIZE = 2;
+    global.PLAYERS_BASE_SPEED = 1;
+    global.PLAYERS_MASS_SPEED = 10;
+    global.START_FOOD = 1000;
+    global.FOOD_ZONE_SIZE = 200;
+    global.NEW_FOOD_SIZE = 1;
     
     // --- GLOBAL GAME OBJECTS ---
     global.SOCKET_LIST = {};
     global.PLAYER_LIST = {};
-    global.ELEMENT_LIST = [];
+    global.ELEMENT_LIST = {};
 
     // Game Initialisation
-    for (var i = 0; i < START_FOOD; i++)
+    for (let i = 0; i < START_FOOD; i++)
     {
-	createFood(Math.floor(Math.random() * (+500 - -400 + 1)) + -400,
-		   Math.floor(Math.random() * (+500 - -400 + 1)) + -400,
-		   0);
+	// - Creates food -
+	let element = new Food("food", NEW_FOOD_SIZE,
+	       Math.floor(Math.random() * (FOOD_ZONE_SIZE - -FOOD_ZONE_SIZE + 1)) + -FOOD_ZONE_SIZE,
+	       Math.floor(Math.random() * (FOOD_ZONE_SIZE - -FOOD_ZONE_SIZE + 1)) + -FOOD_ZONE_SIZE,
+	       0);
     }
 
     /*
@@ -72,9 +78,8 @@ module.exports = (io) => {
 	    socket.player = player;
 	    player.socket = socket;
 
-	    // Sends new player infos to everyone,
 	    // and everyones info to new player
-	    sendNewPlayerInfos(socket, player);
+	    sendGameInfosToNewPlayer(socket, player);
 
             // Keypress events
 	    socket.on('keyPress', function(data) {
@@ -116,12 +121,29 @@ module.exports = (io) => {
 	// Packaging all elements infos into a table.
 	var pack = getElementsInfos(ELEMENT_LIST);
 	// Send the package to every sockets connected, even those not playing.
-	for (var i in SOCKET_LIST)
+	for (var i in PLAYER_LIST)
 	{
-	    var socket = SOCKET_LIST[i];
+	    var socket = PLAYER_LIST[i].socket;
 	    socket.emit('newPositions', pack);
 	}
     }, 1000/FPS);
+
+// Players mass loop
+    setInterval(function(){
+	for (var i in PLAYER_LIST)
+	{
+	    var player = PLAYER_LIST[i];
+	    
+	    // Players lose 1percent on their mass each second
+	    player.setSize(player.size * 0.998);
+	    if (player.size < NEW_FOOD_SIZE)
+		player.Die();
+	}
+
+	// Debug
+	// NONE
+	
+    }, 1000);
 
     return {
 	elements: ELEMENT_LIST,

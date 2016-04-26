@@ -2,12 +2,11 @@
 var getElementsInfos = function(ELEMENT_LIST) {
     var pack = [];
 
-    for (var i in ELEMENT_LIST)
+    for (var i in PLAYER_LIST)
     {
-        var element = ELEMENT_LIST[i];
+        var element = PLAYER_LIST[i];
         pack.push({name: element.name,
-		       id: element.id,
-		       type: element.type,
+		   id: element.id,
                        x: element.body.position.x,
                        y: element.body.position.y,
                        z: element.body.position.z,

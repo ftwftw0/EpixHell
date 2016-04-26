@@ -17,7 +17,6 @@ $(document).ready(function() {
 	// Load my debug tools
 	debug.init();
 
-	render();
     });
 
     function createBaseScene($element) {
@@ -38,15 +37,22 @@ $(document).ready(function() {
 	$el.append(g_renderer.domElement);
     }
 
-    // That's the display loop, should be called 60times/sec
-    function render() {
-//	var timer = Date.now() * 0.0001;
+    
+    function render() 
+    {
 	background.update();
 	cta.update();
 	game.update();
 
 	g_renderer.render(g_scene, g_camera);
-	requestAnimationFrame(render);
     }
+
+    // That's the display loop, should be called 60times/sec
+    setInterval( function () {
+	if ( !(document.webkitHidden) )
+	    requestAnimationFrame( render );
+
+    }, 1000 / 100 );
+
 });
 

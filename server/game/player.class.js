@@ -14,7 +14,7 @@ var Player = function (id, name, size, x, y, z) {
     this.body = new CANNON.Body({
         mass: size, // kg
         position: new CANNON.Vec3(x, y, z), // m
-        shape: new CANNON.Sphere(size)
+        shape: new CANNON.Sphere(Math.sqrt(size))
     });
     
     // Add collisions to newplayer's body
@@ -28,7 +28,7 @@ var Player = function (id, name, size, x, y, z) {
     this.name = name;
     this.type = "player";
     this.size = size;
-    this.speed = 1;
+    this.speed = PLAYERS_BASE_SPEED + PLAYERS_MASS_SPEED / size;
     this.pressingLeft = false;
     this.pressingUp = false;
     this.pressingRight = false;
@@ -36,6 +36,8 @@ var Player = function (id, name, size, x, y, z) {
     // Adds the player to player list, and element list
     PLAYER_LIST[this.id] = this;
     ELEMENT_LIST[this.id] = this;
+    // This sends the NewElem to all clients
+    sendNewElem(this);
 }
 
 // Methods
@@ -48,8 +50,6 @@ Player.prototype.update = function(data) {
         this.body.position.x += this.speed;
     if (this.pressingDown)
         this.body.position.y -= this.speed;
-    
-
 }
 
 /*
@@ -64,62 +64,63 @@ Player.prototype.Die = function() {
     this.setSize(0);
 //    world.removeBody(this.body);
     sendElementDied(this);
-    delete this.body;
+//    delete this.body;
     delete PLAYER_LIST[this.id];
     delete ELEMENT_LIST[this.id];
     delete this;
 }
 
 Player.prototype.replaceBody = function(size) {
-    var body = new CANNON.Body({
-        mass: size, // kg
-        position: new CANNON.Vec3(this.body.position.x,
-                                  this.body.position.y,
-                                  this.body.position.z), // m
-        shape: new CANNON.Sphere(size)
-    });
-    body.collisionResponse = 0; // no impact on other bodys
-
     // Remove old body to create a new one with new size
     this.body.removeEventListener("collide");
     world.removeBody(this.body);
-    delete this.body;
-    this.body = body;
-    this.body.element = this;
-    if (size > 0)
-    {
+    // New one
+    if (size > 0) {
+        this.body = new CANNON.Body({
+            mass: size, // kg
+            position: new CANNON.Vec3(this.body.position.x,
+                                      this.body.position.y,
+                                      this.body.position.z), // m
+            shape: new CANNON.Sphere(Math.sqrt(size))
+        });
 	this.body.addEventListener("collide", function(e){
-	    body.element.collidedWith(e.body.element);
+	    this.element.collidedWith(e.body.element);
 	});
     }
+    else
+    {
+        this.body = new CANNON.Body({
+            mass: size, // kg
+            position: new CANNON.Vec3(this.body.position.x,
+                                      this.body.position.y,
+                                      this.body.position.z) // m
+        });
+    }
+    this.body.collisionResponse = 0; // no impact on other bodys
+    this.body.element = this;
     world.addBody(this.body);
-    console.log("body added");
     return this.body;
 }
 
 // What happens when a player collides with another
 Player.prototype.collidedWith = function(element) {
-    if (element.type === 'player')
+    console.log(this.name + '('+this.size+')');
+    console.log(" collided with ");
+    console.log(element.name + '(' + element.size + ')');
+    if (this.size > element.size)
     {
-	if (PLAYER_LIST[element.socket.id])
-	{
-	    console.log(this.name + '('+this.size+')');
-	    console.log(" collided with ");
-	    console.log(element.name + '(' + element.size + ')');
-	    if (this.size > element.size)
-	    {
-		this.setSize(this.size + element.size);
-		console.log("GOTTA REMOVE PLAYER_LIST[e.body.player.socket.id] :" + PLAYER_LIST[element.socket.id].name);
-		element.Die();
-	    }
-	}
-	else
-	    console.log("Collided with an already dead player.");
+	console.log(this.name + " size before eating " +element.name + " : " + this.size);
+	this.setSize(this.size + element.size);
+	element.Die();
+	console.log(this.name + "size after eating " + element.name + " : " + this.size);
     }
+    if (!ELEMENT_LIST[element.id])
+	console.log("Collided with an already dead object. You know it should not happen... Bodies are still heeere bweheehehee");
 }
 
 Player.prototype.setSize = function(newsize) {
     this.size = newsize;
+    this.speed = PLAYERS_BASE_SPEED + PLAYERS_MASS_SPEED / newsize;
     this.replaceBody(newsize);
 }
 
